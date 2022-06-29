@@ -1,0 +1,97 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "cvue",
+      "version": "1.0.0",
+      "description": "vue源码编写",
+      "main": "index.js",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dezhizhang/cvue.git"
+      },
+      "keywords": [],
+      "author": "",
+      "license": "ISC",
+      "bugs": {
+        "url": "https://github.com/dezhizhang/cvue/issues"
+      },
+      "homepage": "https://github.com/dezhizhang/cvue#readme"
+    },
+    "prefix": "/Users/zhangdezhi/Documents/study/cvue"
+  },
+  "2 debug pnpm:context": {
+    "currentLockfileExists": false,
+    "storeDir": "/Users/zhangdezhi/Library/pnpm/store/v3",
+    "virtualStoreDir": "/Users/zhangdezhi/Documents/study/cvue/node_modules/.pnpm"
+  },
+  "3 debug pnpm:stage": {
+    "prefix": "/Users/zhangdezhi/Documents/study/cvue",
+    "stage": "resolution_started"
+  },
+  "4 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/@rollup/plugin-babel/5.3.1",
+    "wanted": {
+      "dependentId": ".",
+      "name": "@rollup/plugin-babel",
+      "rawSpec": "latest"
+    }
+  },
+  "5 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@rollup/plugin-babel/5.3.1",
+    "requester": "/Users/zhangdezhi/Documents/study/cvue",
+    "status": "resolved"
+  },
+  "6 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/@rollup/plugin-babel/5.3.1",
+    "requester": "/Users/zhangdezhi/Documents/study/cvue",
+    "status": "found_in_store"
+  },
+  "7 debug pnpm:_dependency_resolved": {
+    "resolution": "registry.npmjs.org/rollup/2.75.7",
+    "wanted": {
+      "dependentId": ".",
+      "name": "rollup",
+      "rawSpec": "latest"
+    }
+  },
+  "8 debug pnpm:progress": {
+    "packageId": "registry.npmjs.org/rollup/2.75.7",
+    "requester": "/Users/zhangdezhi/Documents/study/cvue",
+    "status": "resolved"
+  },
+  "9 debug pnpm:fetching-progress": {
+    "attempt": 1,
+    "packageId": "registry.npmjs.org/rollup/2.75.7",
+    "size": 1213458,
+    "status": "started"
+  },
+  "10 error pnpm": {
+    "code": "ERR_PNPM_FETCH_404",
+    "hint": "@babel/cove is not in the npm registry, or you have no permission to fetch it.\n\nNo authorization header was set for the request.",
+    "request": {
+      "url": "https://registry.npmjs.org/@babel%2Fcove"
+    },
+    "response": {
+      "size": 0
+    },
+    "pkgName": "@babel/cove",
+    "spec": {
+      "fetchSpec": "latest",
+      "name": "@babel/cove",
+      "type": "tag"
+    },
+    "pkgsStack": [],
+    "err": {
+      "name": "pnpm",
+      "message": "GET https://registry.npmjs.org/@babel%2Fcove: Not Found - 404",
+      "code": "ERR_PNPM_FETCH_404",
+      "stack": "pnpm: GET https://registry.npmjs.org/@babel%2Fcove: Not Found - 404\n    at RetryOperation._fn (/Users/zhangdezhi/.nvm/versions/node/v14.2.0/lib/node_modules/pnpm/dist/pnpm.cjs:84538:19)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)"
+    }
+  }
+}
