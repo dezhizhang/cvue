@@ -4,40 +4,103 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Vue = factory());
 })(this, (function () { 'use strict';
 
-  var ncname = "[a-zA-Z_][\\-\\.0-9_a-zA-Z]*";
-  var qnameCapture = "((?:".concat(ncname, "\\:)?").concat(ncname, ")");
-  var endTag = new RegExp("^<\\/".concat(qnameCapture, "[^>]*>"));
-  var attribute = /^\s*([^\s”‘<>\/=]+)(?:\s*(=)\s*(?:”([^”]*)”+|'([^’]*)’+|([^\s”‘=<>`]+)))?/;
-  var startTagOpen = new RegExp("^<".concat(qnameCapture));
-  var startTagClode = /^\s*(\/?)>/;
-  function parseHTML(html) {
-    var root;
-    var currentParent;
-    var stack = [];
+  var ncname = "[a-zA-Z_][\\-\\.0-9_a-zA-Z]*"; //标签名
+  // ?：匹配不捕获
 
-    function createAstElement(tagName, attrs) {
+  var qnameCapture = "((?:".concat(ncname, "\\:)?").concat(ncname, ")"); //  <my:xx>
+
+  var startTagOpen = new RegExp("^<".concat(qnameCapture)); //标签开头的正则 捕获的内容是标签名
+
+  var endTag = new RegExp("^<\\/".concat(qnameCapture, "[^>]*>")); //匹配标签结尾的</div>
+
+  var attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/; //匹配属性的   aaa
+
+  var startTagClose = /^\s*(\/?)>/; //匹配标签结束的 >
+
+  function parseHTML(html) {
+    var root; //标签闭合是否符合预期
+
+    var stack = [];
+    var currentParent;
+
+    function parseStartTag() {
+      var start = html.match(startTagOpen);
+
+      if (start) {
+        var match = {
+          tagName: start[1],
+          attrs: []
+        };
+        advance(html, start[0].length);
+
+        var _end;
+
+        var attr;
+
+        while (!(_end = html.match(startTagClose)) && (attr = html.match(attribute))) {
+          match.attrs.push({
+            name: attr[1],
+            value: attr[3] || attr[4] || attr[5]
+          });
+          advance(html, attr[0].length);
+        }
+
+        if (_end) {
+          advance(html, _end[0].length);
+          return match;
+        }
+      }
+    }
+
+    function createASTElement(tagName, attrs) {
       return {
         tag: tagName,
+        //标签名
         type: 1,
+        //元素类型
         children: [],
+        //孩子列表
         attrs: attrs,
-        parent: null
+        //属性集合
+        parent: null //父元素
+
       };
     }
 
     function start(tagName, attrs) {
-      var element = createAstElement(tagName, attrs);
+      var element = createASTElement(tagName, attrs);
 
       if (!root) {
         root = element;
       }
 
-      currentParent = element;
+      currentParent = element; //当前解析的标签 保存起来
+
       stack.push(tagName);
+      console.log(tagName, attrs, "____开始标签___");
+    }
+
+    function end(tagName) {
+      //在结尾标签处  创建父子关系
+      debugger;
+      console.log(tagName, "____结束标签_____");
+      var element = stack.pop(); //取出栈中的最后一个
+
+      currentParent = stack[stack.length - 1];
+
+      if (currentParent) {
+        //在闭合时可以知道这个标签的父亲是谁
+        element.parent = currentParent;
+        currentParent.children.push(element);
+      }
     }
 
     function chars(text) {
+      //把空格删掉
+      debugger;
       text = text.replace(/\s/g, "");
+      console.log(text);
+      console.log(currentParent);
 
       if (text) {
         currentParent.children.push({
@@ -45,90 +108,60 @@
           text: text
         });
       }
-    }
 
-    function end(tagName) {
-      var element = stack.pop();
-      currentParent = stack[stack.length - 1];
-
-      if (currentParent) {
-        element.parent = currentParent;
-        currentParent.children.push(element);
-      }
+      console.log(text, "......文本标签....");
     }
 
     while (html) {
+      //只要html不为空字符串，就一直解析
       var textEnd = html.indexOf("<");
 
-      if (textEnd === 0) {
-        var startTagMatch = parseStartTag(html);
-        console.log(startTagMatch);
-        debugger;
+      if (textEnd == 0) {
+        //肯定是标签
+        var startTagMatch = parseStartTag(); //开始标签匹配的结果  处理开始
 
         if (startTagMatch) {
           start(startTagMatch.tagName, startTagMatch.attrs);
+          continue;
         }
 
         var endTagMatch = html.match(endTag);
-        console.log(endTagMatch);
 
         if (endTagMatch) {
-          html = advance(html, endTagMatch[0].length);
+          //处理结束标签
+          advance(endTagMatch[0].length);
           end(endTagMatch[1]);
+          continue;
         }
       }
 
       var text = void 0;
 
       if (textEnd > 0) {
+        //是文本
         text = html.substring(0, textEnd);
       }
 
       if (text) {
-        html = advance(html, text.length);
+        //处理文本
+        advance(text.length);
         chars(text);
+        console.log(html);
       }
+    }
+
+    function advance(n) {
+      //将字符串进行截取操作，在更新内容
+      html = html.substring(n);
     }
 
     return root;
   }
 
-  function parseStartTag(html) {
-    var start = html.match(startTagOpen);
-
-    if (start) {
-      var match = {
-        tagName: start[1],
-        attrs: []
-      };
-      html = advance(html, start[0].length);
-      var end;
-      var attr;
-
-      while (!(end = html.match(startTagClode)) && (attr = html.match(attribute))) {
-        match.attrs.push({
-          name: attr[1],
-          value: attr[3] || attr[4] || attr[5]
-        });
-        html = advance(html, attr[0].length);
-      }
-
-      if (end) {
-        html = advance(html, end[0].length);
-        return match;
-      }
-    }
-
-    function advance(html, n) {
-      html = html.substring(n);
-      return html;
-    }
-  }
-
   function compileToFunction(template) {
-    var ast = parseHTML(template);
-    console.log(ast); //   const ast = parseHTML(template);
-    //   console.log(ast);
+    var ast = parseHTML(template); //   const ast = parseHTML(template);
+
+    console.log(ast);
   }
 
   function _typeof(obj) {
