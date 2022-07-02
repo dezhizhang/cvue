@@ -132,6 +132,17 @@
     return new Observer(data);
   }
 
+  function proxy(vm, data, key) {
+    Object.defineProperty(vm, key, {
+      get: function get() {
+        return vm[data][key];
+      },
+      set: function set(newValue) {
+        vm[data][key] = newValue;
+      }
+    });
+  }
+
   function initState(vm) {
     var options = vm.$options;
 
@@ -150,10 +161,12 @@
 
   function initData(vm) {
     var data = vm.$options.data;
-    vm._data = data = typeof data == 'function' ? data.call(vm) : data; // for(let key in data) {
-    //   proxy(vm,'_data',key)
-    // }
-    //数据
+    vm._data = data = typeof data == 'function' ? data.call(vm) : data;
+
+    for (var key in data) {
+      proxy(vm, '_data', key);
+    } //数据
+
 
     observe(data);
   }
