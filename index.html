@@ -8,14 +8,14 @@
   </head>
   <body>
     <div id="app">
-        <div>{{arr[0].a}}</div>
+      <div id="my">hello {{name}} <span>world</span></div>
     </div>
     <script src="build/umd/vue.js"></script>
     <script type="text/javascript">
       const vm = new Vue({
         el: "#app",
         data() {
-          return { arr: [{ a: 1 }] };
+          return {arr:[1,2,3],school:{name:'zf',age:10}}
         },
         // render(h) {
         //     return h('div',{id:'a'},'hello')

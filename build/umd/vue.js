@@ -6,11 +6,13 @@
 
   var ncname = "[a-zA-Z_][\\-\\.0-9_a-zA-Z]*";
   var qnameCapture = "((?:".concat(ncname, "\\:)?").concat(ncname, ")");
+  var attribute = /^\s*([^\s”‘<>\/=]+)(?:\s*(=)\s*(?:”([^”]*)”+|'([^’]*)’+|([^\s”‘=<>`]+)))?/;
   var startTagOpen = new RegExp("^<".concat(qnameCapture));
+  var startTagClode = /^\s*(\/?)>/;
 
   function parseHTML(html) {
     while (html) {
-      var textEnd = html.indexOf('<');
+      var textEnd = html.indexOf("<");
 
       if (textEnd === 0) {
         parseStartTag(html);
@@ -27,8 +29,24 @@
         tagName: start[1],
         attrs: []
       };
-      advance(html, start[0].length);
-      console.log('match', match);
+      html = advance(html, start[0].length);
+      var end;
+      var attr;
+
+      while (!(end = html.match(startTagClode)) && (attr = html.match(attribute))) {
+        match.attrs.push({
+          name: attr[1],
+          value: attr[3] || attr[4] || attr[5]
+        });
+        html = advance(html, attr[0].length);
+      }
+
+      console.log("match", match);
+
+      if (end) {
+        html = advance(html, end[0].length);
+        return match;
+      }
     }
   }
 
