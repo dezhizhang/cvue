@@ -176,7 +176,28 @@
       var vm = this;
       vm.$options = optons; // 初始化状态
 
-      initState(vm);
+      initState(vm); //如果当前有el属性说明要渲染模板
+
+      if (vm.$options.el) {
+        vm.$mount(vm.$options.el);
+      }
+    };
+
+    Vue.prototype.$mount = function (el) {
+      var vm = this;
+      var options = vm.$options;
+      el = document.querySelector(el);
+
+      if (!options.render) {
+        var template = options.template;
+
+        if (!template && el) {
+          template = el.outerHTML;
+        }
+
+        var render = compileToFunction(template);
+        options.render = render;
+      }
     };
   }
 
