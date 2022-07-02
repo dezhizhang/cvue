@@ -1,5 +1,5 @@
 import { observe } from "./observer/index";
-
+import { proxy } from './utils';
 export function initState(vm) {
   const options = vm.$options;
   if (options.props) {
@@ -30,6 +30,10 @@ function initMethods() {
 function initData(vm) {
     let data = vm.$options.data;
     vm._data = data = typeof data == 'function' ? data.call(vm):data;
+    
+    // for(let key in data) {
+    //   proxy(vm,'_data',key)
+    // }
     //数据
     observe(data);
     

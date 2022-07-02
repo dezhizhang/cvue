@@ -39,11 +39,25 @@
     return Constructor;
   }
 
+  var oldArrayProtoMethod = Array.prototype;
+  var arrayMethods = Object.create(oldArrayProtoMethod);
+  var methods = ["push", "pop", "shift", "unshift", "reverse", "sort", "splice"];
+  methods.forEach(function (method) {
+    arrayMethods[method] = function () {
+      var result = oldArrayProtoMethod[method].apply(this, arguments);
+      return result;
+    };
+  });
+
   var Observer = /*#__PURE__*/function () {
     function Observer(value) {
       _classCallCheck(this, Observer);
 
-      this.walk(value);
+      if (Array.isArray(value)) {
+        value.__proto__ = arrayMethods;
+      } else {
+        this.walk(value);
+      }
     }
 
     _createClass(Observer, [{
@@ -101,7 +115,10 @@
 
   function initData(vm) {
     var data = vm.$options.data;
-    vm._data = data = typeof data == 'function' ? data.call(vm) : data; //数据
+    vm._data = data = typeof data == 'function' ? data.call(vm) : data; // for(let key in data) {
+    //   proxy(vm,'_data',key)
+    // }
+    //数据
 
     observe(data);
   }

@@ -1,6 +1,12 @@
+import { arrayMethods } from "./array";
+
 class Observer {
   constructor(value) {
-    this.walk(value);
+    if (Array.isArray(value)) {
+      value.__proto__ = arrayMethods
+    } else {
+      this.walk(value);
+    }
   }
   walk(data) {
     let keys = Object.keys(data);
@@ -19,7 +25,7 @@ function defineReactive(data, key, value) {
     set(newValue) {
       if (newValue === value) return;
       observe(newValue);
-      
+
       value = newValue;
     },
   });
