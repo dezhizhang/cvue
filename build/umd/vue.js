@@ -6,19 +6,91 @@
 
   var ncname = "[a-zA-Z_][\\-\\.0-9_a-zA-Z]*";
   var qnameCapture = "((?:".concat(ncname, "\\:)?").concat(ncname, ")");
+  var endTag = new RegExp("^<\\/".concat(qnameCapture, "[^>]*>"));
   var attribute = /^\s*([^\s”‘<>\/=]+)(?:\s*(=)\s*(?:”([^”]*)”+|'([^’]*)’+|([^\s”‘=<>`]+)))?/;
   var startTagOpen = new RegExp("^<".concat(qnameCapture));
   var startTagClode = /^\s*(\/?)>/;
-
   function parseHTML(html) {
+    var root;
+    var currentParent;
+    var stack = [];
+
+    function createAstElement(tagName, attrs) {
+      return {
+        tag: tagName,
+        type: 1,
+        children: [],
+        attrs: attrs,
+        parent: null
+      };
+    }
+
+    function start(tagName, attrs) {
+      var element = createAstElement(tagName, attrs);
+
+      if (!root) {
+        root = element;
+      }
+
+      currentParent = element;
+      stack.push(tagName);
+    }
+
+    function chars(text) {
+      text = text.replace(/\s/g, "");
+
+      if (text) {
+        currentParent.children.push({
+          type: 3,
+          text: text
+        });
+      }
+    }
+
+    function end(tagName) {
+      var element = stack.pop();
+      currentParent = stack[stack.length - 1];
+
+      if (currentParent) {
+        element.parent = currentParent;
+        currentParent.children.push(element);
+      }
+    }
+
     while (html) {
       var textEnd = html.indexOf("<");
 
       if (textEnd === 0) {
-        parseStartTag(html);
-        break;
+        var startTagMatch = parseStartTag(html);
+        console.log(startTagMatch);
+        debugger;
+
+        if (startTagMatch) {
+          start(startTagMatch.tagName, startTagMatch.attrs);
+        }
+
+        var endTagMatch = html.match(endTag);
+        console.log(endTagMatch);
+
+        if (endTagMatch) {
+          html = advance(html, endTagMatch[0].length);
+          end(endTagMatch[1]);
+        }
+      }
+
+      var text = void 0;
+
+      if (textEnd > 0) {
+        text = html.substring(0, textEnd);
+      }
+
+      if (text) {
+        html = advance(html, text.length);
+        chars(text);
       }
     }
+
+    return root;
   }
 
   function parseStartTag(html) {
@@ -41,22 +113,22 @@
         html = advance(html, attr[0].length);
       }
 
-      console.log("match", match);
-
       if (end) {
         html = advance(html, end[0].length);
         return match;
       }
     }
-  }
 
-  function advance(html, n) {
-    html = html.substring(n);
-    return html;
+    function advance(html, n) {
+      html = html.substring(n);
+      return html;
+    }
   }
 
   function compileToFunction(template) {
-    parseHTML(template); // return ast;
+    var ast = parseHTML(template);
+    console.log(ast); //   const ast = parseHTML(template);
+    //   console.log(ast);
   }
 
   function _typeof(obj) {
