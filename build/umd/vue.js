@@ -4,6 +4,43 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Vue = factory());
 })(this, (function () { 'use strict';
 
+  var ncname = "[a-zA-Z_][\\-\\.0-9_a-zA-Z]*";
+  var qnameCapture = "((?:".concat(ncname, "\\:)?").concat(ncname, ")");
+  var startTagOpen = new RegExp("^<".concat(qnameCapture));
+
+  function parseHTML(html) {
+    while (html) {
+      var textEnd = html.indexOf('<');
+
+      if (textEnd === 0) {
+        parseStartTag(html);
+        break;
+      }
+    }
+  }
+
+  function parseStartTag(html) {
+    var start = html.match(startTagOpen);
+
+    if (start) {
+      var match = {
+        tagName: start[1],
+        attrs: []
+      };
+      advance(html, start[0].length);
+      console.log('match', match);
+    }
+  }
+
+  function advance(html, n) {
+    html = html.substring(n);
+    return html;
+  }
+
+  function compileToFunction(template) {
+    parseHTML(template); // return ast;
+  }
+
   function _typeof(obj) {
     "@babel/helpers - typeof";
 

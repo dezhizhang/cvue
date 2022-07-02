@@ -7,7 +7,9 @@
     <title>vue</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+        <div>{{arr[0].a}}</div>
+    </div>
     <script src="build/umd/vue.js"></script>
     <script type="text/javascript">
       const vm = new Vue({
@@ -15,14 +17,11 @@
         data() {
           return { arr: [{ a: 1 }] };
         },
-        render(h) {
-            return h('div',{id:'a'},'hello')
-        },
-        // template: "",
+        // render(h) {
+        //     return h('div',{id:'a'},'hello')
+        // },
+        // // template: "",
       });
-      vm.arr.push({b:1});
-      vm.arr[1].b = 100;
-      console.log(vm.arr[1].b)
     </script>
   </body>
 </html>
