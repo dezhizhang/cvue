@@ -2,11 +2,23 @@ import { arrayMethods } from "./array";
 
 class Observer {
   constructor(value) {
+    Object.defineProperty(value, "__ob__", {
+      enumerable: false,
+      configurable: false,
+      value: this,
+    });
+
     if (Array.isArray(value)) {
-      value.__proto__ = arrayMethods
+      value.__proto__ = arrayMethods;
+      this.observeArray(value);
     } else {
       this.walk(value);
     }
+  }
+  observeArray(value) {
+    value.forEach((item) => {
+      observe(item);
+    });
   }
   walk(data) {
     let keys = Object.keys(data);
@@ -32,9 +44,11 @@ function defineReactive(data, key, value) {
 }
 
 export function observe(data) {
-  console.log(data);
   if (typeof data !== "object" && data !== null) {
-    return;
+    return data;
+  }
+  if(data.__ob__) {
+    return data;
   }
 
   return new Observer(data);

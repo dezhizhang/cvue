@@ -44,7 +44,26 @@
   var methods = ["push", "pop", "shift", "unshift", "reverse", "sort", "splice"];
   methods.forEach(function (method) {
     arrayMethods[method] = function () {
-      var result = oldArrayProtoMethod[method].apply(this, arguments);
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      var result = oldArrayProtoMethod[method].apply(this, args);
+      var inserted;
+      var ob = this.__ob__;
+
+      switch (method) {
+        case "push":
+        case "unshift":
+          inserted = args;
+          break;
+
+        case "splice":
+          inserted = args.slice(2);
+          break;
+      }
+
+      if (inserted) ob.observeArray(inserted);
       return result;
     };
   });
@@ -53,14 +72,28 @@
     function Observer(value) {
       _classCallCheck(this, Observer);
 
+      Object.defineProperty(value, "__ob__", {
+        enumerable: false,
+        configurable: false,
+        value: this
+      });
+
       if (Array.isArray(value)) {
         value.__proto__ = arrayMethods;
+        this.observeArray(value);
       } else {
         this.walk(value);
       }
     }
 
     _createClass(Observer, [{
+      key: "observeArray",
+      value: function observeArray(value) {
+        value.forEach(function (item) {
+          observe(item);
+        });
+      }
+    }, {
       key: "walk",
       value: function walk(data) {
         var keys = Object.keys(data);
@@ -88,10 +121,12 @@
   }
 
   function observe(data) {
-    console.log(data);
-
     if (_typeof(data) !== "object" && data !== null) {
-      return;
+      return data;
+    }
+
+    if (data.__ob__) {
+      return data;
     }
 
     return new Observer(data);
