@@ -96,14 +96,16 @@ export function parseHTML(html) {
             const startTagMatch = parseStartTag(); //开始标签匹配的结果  处理开始
             if (startTagMatch) {
                 start(startTagMatch.tagName, startTagMatch.attrs);
-                continue;
+                break;
+                // continue;
             }
             const endTagMatch = html.match(endTag);
             if (endTagMatch) {
                 //处理结束标签
                 advance(endTagMatch[0].length);
                 end(endTagMatch[1]);
-                continue;
+                break;
+                // continue;
             }
         }
         let text;

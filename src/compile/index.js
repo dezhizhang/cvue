@@ -1,7 +1,10 @@
 import { parseHTML } from "./parse";
+import { generate } from "./generate";
 
 export function compileToFunction(template) {
-    const ast = parseHTML(template);
-//   const ast = parseHTML(template);
-  console.log(ast);
+  // let ast = parseHTML(template);
+
+  let code = generate("hello");
+
+  console.log('hello')
 }
