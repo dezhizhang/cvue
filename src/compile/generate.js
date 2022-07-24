@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-03 15:55:05
  * :last editor: 张德志
- * :date last edited: 2022-07-25 06:57:05
+ * :date last edited: 2022-07-25 07:02:17
  */
 
 
@@ -36,12 +36,19 @@ function genChildren(ast) {
 
 
 function gen(node) {
+    if(node.type === 1) {
+        return generate(node);
+    }else {
+        let text = node.text;
+        return `_v(${JSON.stringify(text)})`
+        console.log('text',text);
 
+    }
 }
 
 export function generate(ast) { 
     let children = genChildren(ast);
-    let code = `_c('${ast.tag}',${ast.attrs.length ? `${genProps(ast.attrs)}`:'undefined'},${children ? `,${children}`:''})`;
+    let code = `_c('${ast.tag}',${ast.attrs.length ? `${genProps(ast.attrs)}`:'undefined'},${children ? `${children}`:''})`;
 
      return code;
      

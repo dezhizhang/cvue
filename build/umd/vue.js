@@ -258,7 +258,7 @@
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-03 15:55:05
    * :last editor: 张德志
-   * :date last edited: 2022-07-25 06:57:05
+   * :date last edited: 2022-07-25 07:02:17
    */
   function genProps(attrs) {
     var str = '';
@@ -293,16 +293,23 @@
 
     if (children) {
       return children.map(function (child) {
-        return gen();
+        return gen(child);
       }).join(',');
     }
   }
 
-  function gen(node) {}
+  function gen(node) {
+    if (node.type === 1) {
+      return generate(node);
+    } else {
+      var text = node.text;
+      return "_v(".concat(JSON.stringify(text), ")");
+    }
+  }
 
   function generate(ast) {
     var children = genChildren(ast);
-    var code = "_c('".concat(ast.tag, "',").concat(ast.attrs.length ? "".concat(genProps(ast.attrs)) : 'undefined', ",").concat(children ? ",".concat(children) : '', ")");
+    var code = "_c('".concat(ast.tag, "',").concat(ast.attrs.length ? "".concat(genProps(ast.attrs)) : 'undefined', ",").concat(children ? "".concat(children) : '', ")");
     return code;
   }
 
