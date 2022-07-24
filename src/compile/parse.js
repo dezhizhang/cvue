@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-02 21:08:47
  * :last editor: 张德志
- * :date last edited: 2022-07-25 05:45:54
+ * :date last edited: 2022-07-25 06:03:26
  */
 const ncname = `[a-zA-Z_][\\-\\.0-9_a-zA-Z]*`; //标签名
 // ?：匹配不捕获
@@ -65,11 +65,10 @@ export function parseHTML(html) {
             root = element;
         }
         currentParent = element; //当前解析的标签 保存起来
-        stack.push(tagName);
+        stack.push(element);
     }
     function end(tagName) {
         //在结尾标签处  创建父子关系
-        console.log(tagName, "____结束标签_____");
         let element = stack.pop(); //取出栈中的最后一个
         currentParent = stack[stack.length - 1];
         if (currentParent) {
@@ -112,12 +111,11 @@ export function parseHTML(html) {
             //是文本
             text = html.substring(0, textEnd);
         }
-        
+
         if (text) {
             //处理文本
             advance(text.length);
             chars(text);
-            console.log(html);
         }
     }
     function advance(n) {
