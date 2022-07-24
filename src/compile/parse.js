@@ -1,3 +1,12 @@
+/*
+ * :file description: 
+ * :name: /cvue/src/compile/parse.js
+ * :author: 张德志
+ * :copyright: (c) 2022, Tungee
+ * :date created: 2022-07-02 21:08:47
+ * :last editor: 张德志
+ * :date last edited: 2022-07-25 05:45:54
+ */
 const ncname = `[a-zA-Z_][\\-\\.0-9_a-zA-Z]*`; //标签名
 // ?：匹配不捕获
 const qnameCapture = `((?:${ncname}\\:)?${ncname})`; //  <my:xx>
@@ -22,21 +31,19 @@ export function parseHTML(html) {
                 tagName: start[1],
                 attrs: [],
             };
-            advance(html, start[0].length);
+            
+            advance(start[0].length);
             let end;
             let attr;
-            while (
-                !(end = html.match(startTagClose)) &&
-                (attr = html.match(attribute))
-            ) {
+            while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {  
                 match.attrs.push({
                     name: attr[1],
                     value: attr[3] || attr[4] || attr[5],
                 });
-                advance(html, attr[0].length);
+                advance(attr[0].length);
             }
             if (end) {
-                advance(html, end[0].length);
+                advance(end[0].length);
                 return match;
             }
         }
@@ -59,11 +66,9 @@ export function parseHTML(html) {
         }
         currentParent = element; //当前解析的标签 保存起来
         stack.push(tagName);
-        console.log(tagName, attrs, "____开始标签___");
     }
     function end(tagName) {
         //在结尾标签处  创建父子关系
-        debugger;
         console.log(tagName, "____结束标签_____");
         let element = stack.pop(); //取出栈中的最后一个
         currentParent = stack[stack.length - 1];
@@ -75,37 +80,31 @@ export function parseHTML(html) {
     }
     function chars(text) {
         //把空格删掉
-        debugger;
         text = text.replace(/\s/g, "");
-        console.log(text);
-        console.log(currentParent);
         if (text) {
             currentParent.children.push({
                 type: 3,
                 text,
             });
         }
-        console.log(text, "......文本标签....");
     }
 
     while (html) {
         //只要html不为空字符串，就一直解析
         let textEnd = html.indexOf("<");
         if (textEnd == 0) {
-            //肯定是标签
             const startTagMatch = parseStartTag(); //开始标签匹配的结果  处理开始
             if (startTagMatch) {
                 start(startTagMatch.tagName, startTagMatch.attrs);
-                break;
-                // continue;
+                continue;
             }
+
             const endTagMatch = html.match(endTag);
             if (endTagMatch) {
                 //处理结束标签
                 advance(endTagMatch[0].length);
                 end(endTagMatch[1]);
-                break;
-                // continue;
+                continue;
             }
         }
         let text;
@@ -113,6 +112,7 @@ export function parseHTML(html) {
             //是文本
             text = html.substring(0, textEnd);
         }
+        
         if (text) {
             //处理文本
             advance(text.length);

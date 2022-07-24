@@ -4,8 +4,173 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Vue = factory());
 })(this, (function () { 'use strict';
 
+  /*
+   * :file description: 
+   * :name: /cvue/src/compile/parse.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-02 21:08:47
+   * :last editor: 张德志
+   * :date last edited: 2022-07-25 05:45:54
+   */
+  var ncname = "[a-zA-Z_][\\-\\.0-9_a-zA-Z]*"; //标签名
+  // ?：匹配不捕获
+
+  var qnameCapture = "((?:".concat(ncname, "\\:)?").concat(ncname, ")"); //  <my:xx>
+
+  var startTagOpen = new RegExp("^<".concat(qnameCapture)); //标签开头的正则 捕获的内容是标签名
+
+  var endTag = new RegExp("^<\\/".concat(qnameCapture, "[^>]*>")); //匹配标签结尾的</div>
+
+  var attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/; //匹配属性的   aaa
+
+  var startTagClose = /^\s*(\/?)>/; //匹配标签结束的 >
+
+  function parseHTML(html) {
+    var root; //标签闭合是否符合预期
+
+    var stack = [];
+    var currentParent;
+
+    function parseStartTag() {
+      var start = html.match(startTagOpen);
+
+      if (start) {
+        var match = {
+          tagName: start[1],
+          attrs: []
+        };
+        advance(start[0].length);
+
+        var _end;
+
+        var attr;
+
+        while (!(_end = html.match(startTagClose)) && (attr = html.match(attribute))) {
+          match.attrs.push({
+            name: attr[1],
+            value: attr[3] || attr[4] || attr[5]
+          });
+          advance(attr[0].length);
+        }
+
+        if (_end) {
+          advance(_end[0].length);
+          return match;
+        }
+      }
+    }
+
+    function createASTElement(tagName, attrs) {
+      return {
+        tag: tagName,
+        //标签名
+        type: 1,
+        //元素类型
+        children: [],
+        //孩子列表
+        attrs: attrs,
+        //属性集合
+        parent: null //父元素
+
+      };
+    }
+
+    function start(tagName, attrs) {
+      var element = createASTElement(tagName, attrs);
+
+      if (!root) {
+        root = element;
+      }
+
+      currentParent = element; //当前解析的标签 保存起来
+
+      stack.push(tagName);
+    }
+
+    function end(tagName) {
+      //在结尾标签处  创建父子关系
+      console.log(tagName, "____结束标签_____");
+      var element = stack.pop(); //取出栈中的最后一个
+
+      currentParent = stack[stack.length - 1];
+
+      if (currentParent) {
+        //在闭合时可以知道这个标签的父亲是谁
+        element.parent = currentParent;
+        currentParent.children.push(element);
+      }
+    }
+
+    function chars(text) {
+      //把空格删掉
+      text = text.replace(/\s/g, "");
+
+      if (text) {
+        currentParent.children.push({
+          type: 3,
+          text: text
+        });
+      }
+    }
+
+    while (html) {
+      //只要html不为空字符串，就一直解析
+      var textEnd = html.indexOf("<");
+
+      if (textEnd == 0) {
+        var startTagMatch = parseStartTag(); //开始标签匹配的结果  处理开始
+
+        if (startTagMatch) {
+          start(startTagMatch.tagName, startTagMatch.attrs);
+          continue;
+        }
+
+        var endTagMatch = html.match(endTag);
+
+        if (endTagMatch) {
+          //处理结束标签
+          advance(endTagMatch[0].length);
+          end(endTagMatch[1]);
+          continue;
+        }
+      }
+
+      var text = void 0;
+
+      if (textEnd > 0) {
+        //是文本
+        text = html.substring(0, textEnd);
+      }
+
+      if (text) {
+        //处理文本
+        advance(text.length);
+        chars(text);
+        console.log(html);
+      }
+    }
+
+    function advance(n) {
+      //将字符串进行截取操作，在更新内容
+      html = html.substring(n);
+    }
+
+    return root;
+  }
+
+  /*
+   * :file description: 
+   * :name: /cvue/src/compile/index.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-02 16:40:54
+   * :last editor: 张德志
+   * :date last edited: 2022-07-25 04:57:24
+   */
   function compileToFunction(template) {
-    console.log('hello');
+    var ast = parseHTML(template);
+    console.log('ast', ast);
   }
 
   function _typeof(obj) {
@@ -208,7 +373,7 @@
           template = el.outerHTML;
         }
 
-        var render = compileToFunction();
+        var render = compileToFunction(template);
         options.render = render;
       }
     };
