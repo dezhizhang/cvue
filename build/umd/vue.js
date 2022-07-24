@@ -175,6 +175,15 @@
     observe(data);
   }
 
+  /*
+   * :file description: 
+   * :name: /cvue/src/init.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-01 06:06:37
+   * :last editor: 张德志
+   * :date last edited: 2022-07-25 04:43:58
+   */
   function initMixin(Vue) {
     Vue.prototype._init = function (optons) {
       var vm = this;

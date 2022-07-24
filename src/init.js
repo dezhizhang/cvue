@@ -1,3 +1,12 @@
+/*
+ * :file description: 
+ * :name: /cvue/src/init.js
+ * :author: 张德志
+ * :copyright: (c) 2022, Tungee
+ * :date created: 2022-07-01 06:06:37
+ * :last editor: 张德志
+ * :date last edited: 2022-07-25 04:43:58
+ */
 import { compileToFunction } from "./compile/index";
 import { initState } from "./state";
 
@@ -23,7 +32,7 @@ export function initMixin(Vue) {
       let template = options.template;
       if(!template && el) {
         template = el.outerHTML;
-      }
+      } 
       const render = compileToFunction(template);
       options.render = render;
     }
