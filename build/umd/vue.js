@@ -252,28 +252,28 @@
   }
 
   /*
-   * :file description: 
+   * :file description:
    * :name: /cvue/src/compile/generate.js
    * :author: 张德志
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-03 15:55:05
    * :last editor: 张德志
-   * :date last edited: 2022-07-26 05:37:46
+   * :date last edited: 2022-07-26 05:39:38
    */
   var defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g;
 
   function genProps(attrs) {
-    var str = '';
+    var str = "";
 
     for (var i = 0; i < attrs.length; i++) {
       var attr = attrs[i];
-      console.log('attr', attr);
+      console.log("attr", attr);
 
-      if (attr.name === 'style') {
+      if (attr.name === "style") {
         (function () {
           var obj = {};
-          attr.value.split(';').forEach(function (item) {
-            var _item$split = item.split(':'),
+          attr.value.split(";").forEach(function (item) {
+            var _item$split = item.split(":"),
                 _item$split2 = _slicedToArray(_item$split, 2),
                 key = _item$split2[0],
                 value = _item$split2[1];
@@ -296,7 +296,7 @@
     if (children) {
       return children.map(function (child) {
         return gen(child);
-      }).join(',');
+      }).join(",");
     }
   }
 
@@ -330,13 +330,13 @@
         tokens.push(JSON.stringify(text.slice(lastIndex)));
       }
 
-      return "_v(".concat(tokens.join('+'), ")");
+      return "_v(".concat(tokens.join("+"), ")");
     }
   }
 
   function generate(ast) {
     var children = genChildren(ast);
-    var code = "_c('".concat(ast.tag, "',").concat(ast.attrs.length ? "".concat(genProps(ast.attrs)) : 'undefined', ",").concat(children ? "".concat(children) : '', ")");
+    var code = "_c('".concat(ast.tag, "',").concat(ast.attrs.length ? "".concat(genProps(ast.attrs)) : "undefined", ",").concat(children ? "".concat(children) : "", ")");
     return code;
   }
 
