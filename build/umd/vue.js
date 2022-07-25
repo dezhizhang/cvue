@@ -494,22 +494,63 @@
 
   /*
    * :file description: 
+   * :name: /cvue/src/vdom/patch.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-26 06:43:13
+   * :last editor: 张德志
+   * :date last edited: 2022-07-26 06:54:59
+   */
+  function patch(oldVnode, vnode) {
+    // 将虚拟节点转换成真实节点
+    var el = createElm(vnode);
+    var parentElm = oldVnode.parentNode;
+    parentElm.insertBefore(el, oldVnode.nextSibling); // 删除老节点
+
+    parentElm.removeChild(oldVnode);
+  }
+
+  function createElm(vnode) {
+    var tag = vnode.tag,
+        children = vnode.children;
+        vnode.key;
+        vnode.data;
+        var text = vnode.text;
+
+    if (typeof tag === 'string') {
+      vnode.el = document.createElement(tag);
+      children.forEach(function (child) {
+        vnode.el.appendChild(createElm(child));
+      });
+    } else {
+      vnode.el = document.createTextNode(text);
+    }
+
+    return vnode.el;
+  }
+
+  /*
+   * :file description: 
    * :name: /cvue/src/lifcycle.js
    * :author: 张德志
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-26 05:53:23
    * :last editor: 张德志
-   * :date last edited: 2022-07-26 06:35:38
+   * :date last edited: 2022-07-26 06:58:21
    */
   function lifcycleMixin(Vue) {
     Vue.prototype._update = function (vnode) {
-      console.log('---------', vnode);
+      var vm = this;
+      patch(vm.$el, vnode);
     };
   }
   function mountComponent(vm, el) {
     // 先调用render方法创建虚拟节点
     vm._update(vm._render());
-  }
+  } // vue渲染流程
+  //1先初始化数据
+  //2将模板进行编译
+  //3生成虚拟dom
 
   /*
    * :file description:
@@ -518,7 +559,7 @@
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-01 06:06:37
    * :last editor: 张德志
-   * :date last edited: 2022-07-26 06:37:30
+   * :date last edited: 2022-07-26 06:43:02
    */
   function initMixin(Vue) {
     Vue.prototype._init = function (optons) {
@@ -536,6 +577,7 @@
       var vm = this;
       var options = vm.$options;
       el = document.querySelector(el);
+      vm.$el = el;
 
       if (!options.render) {
         var template = options.template;

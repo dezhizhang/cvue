@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 06:06:37
  * :last editor: 张德志
- * :date last edited: 2022-07-26 06:37:30
+ * :date last edited: 2022-07-26 06:43:02
  */
 import { compileToFunction } from "./compile/index";
 import { initState } from "./state";
@@ -28,6 +28,7 @@ export function initMixin(Vue) {
     const vm = this;
     const options = vm.$options;
     el = document.querySelector(el);
+    vm.$el = el;
 
     if (!options.render) {
       let template = options.template;
