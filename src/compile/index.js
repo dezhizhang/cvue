@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-02 16:40:54
  * :last editor: 张德志
- * :date last edited: 2022-07-25 06:51:58
+ * :date last edited: 2022-07-26 05:46:17
  */
 import { parseHTML } from "./parse";
 import { generate } from "./generate";
@@ -18,6 +18,9 @@ export function compileToFunction(template) {
   // 生成code
   let code = generate(ast);
 
-  console.log('code',code);
+  // 将字符串变成函数，限制取值范围
+  let render = new Function(`with(this){return ${code}}`);
+
+  return render;
   
 }

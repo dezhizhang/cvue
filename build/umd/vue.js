@@ -347,15 +347,17 @@
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-02 16:40:54
    * :last editor: 张德志
-   * :date last edited: 2022-07-25 06:51:58
+   * :date last edited: 2022-07-26 05:46:17
    */
   function compileToFunction(template) {
     //解析html模板
     var ast = parseHTML(template);
     console.log('ast', ast); // 生成code
 
-    var code = generate(ast);
-    console.log('code', code);
+    var code = generate(ast); // 将字符串变成函数，限制取值范围
+
+    var render = new Function("with(this){return ".concat(code, "}"));
+    return render;
   }
 
   var oldArrayProtoMethod = Array.prototype;
@@ -492,12 +494,31 @@
 
   /*
    * :file description: 
+   * :name: /cvue/src/lifcycle.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-26 05:53:23
+   * :last editor: 张德志
+   * :date last edited: 2022-07-26 06:35:38
+   */
+  function lifcycleMixin(Vue) {
+    Vue.prototype._update = function (vnode) {
+      console.log('---------', vnode);
+    };
+  }
+  function mountComponent(vm, el) {
+    // 先调用render方法创建虚拟节点
+    vm._update(vm._render());
+  }
+
+  /*
+   * :file description:
    * :name: /cvue/src/init.js
    * :author: 张德志
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-01 06:06:37
    * :last editor: 张德志
-   * :date last edited: 2022-07-25 04:43:58
+   * :date last edited: 2022-07-26 06:37:30
    */
   function initMixin(Vue) {
     Vue.prototype._init = function (optons) {
@@ -526,14 +547,85 @@
         var render = compileToFunction(template);
         options.render = render;
       }
+
+      mountComponent(vm);
     };
   }
+
+  /*
+   * :file description:
+   * :name: /cvue/src/vdom/index.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-26 06:02:25
+   * :last editor: 张德志
+   * :date last edited: 2022-07-26 06:33:57
+   */
+  function renderMinix(Vue) {
+    Vue.prototype._c = function () {
+      return createElement.apply(void 0, arguments);
+    };
+
+    Vue.prototype._s = function (value) {
+      return value == null ? "" : _typeof(value) == "object" ? JSON.stringify(value) : value;
+    };
+
+    Vue.prototype._v = function (text) {
+      return createTextVnode(text);
+    };
+
+    Vue.prototype._render = function () {
+      var vm = this;
+      var render = vm.$options.render;
+      var vnode = render.call(vm);
+      return vnode;
+    };
+  }
+
+  function createElement(tag) {
+    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    for (var _len = arguments.length, children = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      children[_key - 2] = arguments[_key];
+    }
+
+    return vnode(tag, data, data.key, children);
+  }
+
+  function createTextVnode(text) {
+    return vnode(undefined, undefined, undefined, undefined, text);
+  } // 用来产生虚拟dom
+
+
+  function vnode(tag, data, key, children, text) {
+    return {
+      tag: tag,
+      data: data,
+      key: key,
+      children: children,
+      text: text
+    };
+  }
+
+  /*
+   * :file description: 
+   * :name: /cvue/src/index.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-01 05:49:48
+   * :last editor: 张德志
+   * :date last edited: 2022-07-26 06:20:15
+   */
 
   function Vue(optons) {
     this._init(optons);
   }
 
-  initMixin(Vue);
+  initMixin(Vue); //混合生命周期 渲染
+
+  lifcycleMixin(Vue); //
+
+  renderMinix(Vue);
 
   return Vue;
 

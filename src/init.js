@@ -1,14 +1,15 @@
 /*
- * :file description: 
+ * :file description:
  * :name: /cvue/src/init.js
  * :author: 张德志
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 06:06:37
  * :last editor: 张德志
- * :date last edited: 2022-07-25 04:43:58
+ * :date last edited: 2022-07-26 06:37:30
  */
 import { compileToFunction } from "./compile/index";
 import { initState } from "./state";
+import { mountComponent } from "./lifcycle";
 
 export function initMixin(Vue) {
   Vue.prototype._init = function (optons) {
@@ -19,22 +20,23 @@ export function initMixin(Vue) {
     initState(vm);
 
     //如果当前有el属性说明要渲染模板
-    if(vm.$options.el) {
+    if (vm.$options.el) {
       vm.$mount(vm.$options.el);
     }
   };
-  Vue.prototype.$mount = function(el) {
+  Vue.prototype.$mount = function (el) {
     const vm = this;
     const options = vm.$options;
     el = document.querySelector(el);
 
-    if(!options.render) {
+    if (!options.render) {
       let template = options.template;
-      if(!template && el) {
+      if (!template && el) {
         template = el.outerHTML;
-      } 
+      }
       const render = compileToFunction(template);
       options.render = render;
     }
-  }
+    mountComponent(vm, el);
+  };
 }
