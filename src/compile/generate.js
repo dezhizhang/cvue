@@ -5,8 +5,9 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-03 15:55:05
  * :last editor: 张德志
- * :date last edited: 2022-07-25 07:02:17
+ * :date last edited: 2022-07-26 05:37:46
  */
+const defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g;
 
 
 function genProps(attrs) {
@@ -40,9 +41,26 @@ function gen(node) {
         return generate(node);
     }else {
         let text = node.text;
-        return `_v(${JSON.stringify(text)})`
-        console.log('text',text);
+        if(!defaultTagRE.test(text)) {
+            return `_v(${JSON.stringify(text)})`
+        }
 
+        let tokens = []; // 存放每一段的代码
+        let lastIndex = defaultTagRE.lastIndex = 0;
+        let match,index;
+        while(match = defaultTagRE.exec(text)) {
+            index = match.index;
+            if(index > lastIndex)  {
+                tokens.push(JSON.stringify(text.slice(lastIndex,index)));
+            }
+            tokens.push(`_s(${match[1].trim()})`);
+            lastIndex = index + match[0].length;
+        }
+        if(lastIndex < text.length) {
+            tokens.push(JSON.stringify(text.slice(lastIndex)));
+        }
+
+        return `_v(${tokens.join('+')})`;
     }
 }
 

@@ -258,8 +258,10 @@
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-03 15:55:05
    * :last editor: 张德志
-   * :date last edited: 2022-07-25 07:02:17
+   * :date last edited: 2022-07-26 05:37:46
    */
+  var defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g;
+
   function genProps(attrs) {
     var str = '';
 
@@ -303,7 +305,32 @@
       return generate(node);
     } else {
       var text = node.text;
-      return "_v(".concat(JSON.stringify(text), ")");
+
+      if (!defaultTagRE.test(text)) {
+        return "_v(".concat(JSON.stringify(text), ")");
+      }
+
+      var tokens = []; // 存放每一段的代码
+
+      var lastIndex = defaultTagRE.lastIndex = 0;
+      var match, index;
+
+      while (match = defaultTagRE.exec(text)) {
+        index = match.index;
+
+        if (index > lastIndex) {
+          tokens.push(JSON.stringify(text.slice(lastIndex, index)));
+        }
+
+        tokens.push("_s(".concat(match[1].trim(), ")"));
+        lastIndex = index + match[0].length;
+      }
+
+      if (lastIndex < text.length) {
+        tokens.push(JSON.stringify(text.slice(lastIndex)));
+      }
+
+      return "_v(".concat(tokens.join('+'), ")");
     }
   }
 
