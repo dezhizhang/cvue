@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-26 06:43:13
  * :last editor: 张德志
- * :date last edited: 2022-07-26 06:54:59
+ * :date last edited: 2022-07-28 06:14:17
  */
 
 
@@ -30,4 +30,20 @@ function createElm(vnode) {
         vnode.el = document.createTextNode(text);
     }
     return vnode.el;
+}
+
+function updateProperties(vnode) {
+    let el = vnode.el;
+    let newProps = vnode.data || {};
+    for(let key in newProps) {
+        if(key == 'style') {
+            for(let styleName in newProps.key) {
+                el.style[styleName] = newProps.style[styleName];
+            }
+        }else if(key == 'class') {
+            el.className = el.class;
+        }else {
+            el.setAttribute(key,newProps[key]);
+        }
+    }
 }
