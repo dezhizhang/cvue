@@ -5,13 +5,14 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-26 06:43:13
  * :last editor: 张德志
- * :date last edited: 2022-07-28 06:14:17
+ * :date last edited: 2022-07-28 06:21:32
  */
 
 
 export function patch(oldVnode,vnode) {
     // 将虚拟节点转换成真实节点
     let el = createElm(vnode);
+    updateProperties(vnode);
     let parentElm = oldVnode.parentNode;
     parentElm.insertBefore(el,oldVnode.nextSibling);
     // 删除老节点

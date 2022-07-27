@@ -453,6 +453,16 @@
     return new Observer(data);
   }
 
+  /*
+   * :file description: 
+
+   * :name: /cvue/src/utils.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-02 14:41:16
+   * :last editor: 张德志
+   * :date last edited: 2022-07-28 07:20:59
+   */
   function proxy(vm, data, key) {
     Object.defineProperty(vm, key, {
       get: function get() {
@@ -499,11 +509,12 @@
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-26 06:43:13
    * :last editor: 张德志
-   * :date last edited: 2022-07-28 06:14:17
+   * :date last edited: 2022-07-28 06:21:32
    */
   function patch(oldVnode, vnode) {
     // 将虚拟节点转换成真实节点
     var el = createElm(vnode);
+    updateProperties(vnode);
     var parentElm = oldVnode.parentNode;
     parentElm.insertBefore(el, oldVnode.nextSibling); // 删除老节点
 
@@ -527,6 +538,23 @@
     }
 
     return vnode.el;
+  }
+
+  function updateProperties(vnode) {
+    var el = vnode.el;
+    var newProps = vnode.data || {};
+
+    for (var key in newProps) {
+      if (key == 'style') {
+        for (var styleName in newProps.key) {
+          el.style[styleName] = newProps.style[styleName];
+        }
+      } else if (key == 'class') {
+        el.className = el["class"];
+      } else {
+        el.setAttribute(key, newProps[key]);
+      }
+    }
   }
 
   /*
