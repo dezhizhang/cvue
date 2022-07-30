@@ -6,7 +6,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-02 14:41:16
  * :last editor: 张德志
- * :date last edited: 2022-07-28 07:20:59
+ * :date last edited: 2022-07-31 07:37:44
  */
 export function proxy(vm, data, key) {
 
@@ -21,11 +21,33 @@ export function proxy(vm, data, key) {
 }
 
 
-let strats = {};
+
 
 export const LIFECYCLE_HOOKS = [
-
+  'beforeCreate',
+  'created',
+  'beforeMount',
+  'mounted',
+  'beforeUpdate',
+  'update',
+  'beforeDestory',
+  'destroyed',
 ];
+
+let strats = {};
+
+strats.data = function() {
+  
+}
+
+strats.computed = function() {
+
+}
+
+strats.watch = function() {
+
+}
+
 
 LIFECYCLE_HOOKS.forEach(hook => {
   strats[hook] = mergeHook
@@ -51,7 +73,7 @@ export function mergeOptions(parent,child) {
   }
 
   for(let key in child) {
-    if(parent.hashOwnProperty(key)) {
+    if(parent && !parent.hasOwnProperty(key)) {
       mergeField(key);
     }
   }

@@ -461,7 +461,7 @@
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-02 14:41:16
    * :last editor: 张德志
-   * :date last edited: 2022-07-28 07:20:59
+   * :date last edited: 2022-07-31 07:37:44
    */
   function proxy(vm, data, key) {
     Object.defineProperty(vm, key, {
@@ -472,6 +472,52 @@
         vm[data][key] = newValue;
       }
     });
+  }
+  var LIFECYCLE_HOOKS = ['beforeCreate', 'created', 'beforeMount', 'mounted', 'beforeUpdate', 'update', 'beforeDestory', 'destroyed'];
+  var strats = {};
+
+  strats.data = function () {};
+
+  strats.computed = function () {};
+
+  strats.watch = function () {};
+
+  LIFECYCLE_HOOKS.forEach(function (hook) {
+    strats[hook] = mergeHook;
+  });
+
+  function mergeHook(parentVal, childValue) {
+    if (childValue) {
+      if (parentVal) {
+        return parentVal.concat(childValue);
+      } else {
+        return [childValue];
+      }
+    } else {
+      return parentVal;
+    }
+  }
+
+  function mergeOptions(parent, child) {
+    var options = {};
+
+    for (var key in parent) {
+      mergeField(key);
+    }
+
+    for (var _key in child) {
+      if (parent && !parent.hasOwnProperty(_key)) {
+        mergeField(_key);
+      }
+    }
+
+    function mergeField(key) {
+      if (strats[key]) {
+        options[key] = strats[key](parent[key], child[key]);
+      }
+    }
+
+    return options;
   }
 
   function initState(vm) {
@@ -679,12 +725,30 @@
 
   /*
    * :file description: 
+   * :name: /cvue/src/global-api/index.js
+   * :author: 张德志
+   * :copyright: (c) 2022, Tungee
+   * :date created: 2022-07-28 06:29:11
+   * :last editor: 张德志
+   * :date last edited: 2022-07-31 07:38:28
+   */
+  function initGlobalApi(Vue) {
+    Vue.options = {};
+
+    Vue.mixin = function (mixin) {
+      this.options = mergeOptions(this.options, mixin);
+      console.log('------', this.options);
+    };
+  }
+
+  /*
+   * :file description: 
    * :name: /cvue/src/index.js
    * :author: 张德志
    * :copyright: (c) 2022, Tungee
    * :date created: 2022-07-01 05:49:48
    * :last editor: 张德志
-   * :date last edited: 2022-07-26 06:20:15
+   * :date last edited: 2022-07-31 07:12:18
    */
 
   function Vue(optons) {
@@ -695,7 +759,9 @@
 
   lifcycleMixin(Vue); //
 
-  renderMinix(Vue);
+  renderMinix(Vue); //初始化全局api
+
+  initGlobalApi(Vue);
 
   return Vue;
 
