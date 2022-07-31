@@ -6,7 +6,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-02 14:41:16
  * :last editor: 张德志
- * :date last edited: 2022-07-31 07:37:44
+ * :date last edited: 2022-07-31 07:57:45
  */
 export function proxy(vm, data, key) {
 
@@ -36,8 +36,8 @@ export const LIFECYCLE_HOOKS = [
 
 let strats = {};
 
-strats.data = function() {
-  
+strats.data = function(parentVal,childVal) {
+  return childVal;
 }
 
 strats.computed = function() {
@@ -82,7 +82,7 @@ export function mergeOptions(parent,child) {
     if(strats[key]) {
       options[key] = strats[key](parent[key],child[key])
     }else {
-
+      options[key] = child[key];
     }
   }
   return options;

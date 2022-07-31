@@ -5,16 +5,18 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 06:06:37
  * :last editor: 张德志
- * :date last edited: 2022-07-26 06:43:02
+ * :date last edited: 2022-07-31 08:00:24
  */
 import { compileToFunction } from "./compile/index";
 import { initState } from "./state";
 import { mountComponent } from "./lifcycle";
+import { mergeOptions } from './utils'
 
 export function initMixin(Vue) {
   Vue.prototype._init = function (optons) {
     const vm = this;
-    vm.$options = optons;
+    // 将用户自定义的options进行合并
+    vm.$options = mergeOptions(vm.constructor.options,optons);
 
     // 初始化状态
     initState(vm);
