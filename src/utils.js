@@ -6,7 +6,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-02 14:41:16
  * :last editor: 张德志
- * :date last edited: 2022-07-31 07:57:45
+ * :date last edited: 2022-07-31 15:56:01
  */
 export function proxy(vm, data, key) {
 
@@ -87,4 +87,43 @@ export function mergeOptions(parent,child) {
   }
   return options;
 
+}
+let pending = false;
+let callbacks = [];
+function flushCallbacks() {
+  callbacks.forEach(cb => cb());
+  pending = true;
+}
+
+let timerFunc;
+if(Promise) {
+  timerFunc = () => {
+    Promise.resolve().then(flushCallbacks);
+  }
+}else if(MutationObserver) {
+  let observe = new MutationObserver(flushCallbacks);
+  let textNode = document.createTextNode(1);
+  observe.observe(textNode,{characterData:true});
+  timerFunc = () => {
+    textNode.textContent = 2;
+  }
+}else if(setImmediate) {
+  timerFunc = () => {
+    setImmediate(flushCallbacks);
+  }
+}else {
+  timerFunc = () => {
+    setTimeout(flushCallbacks);
+  }
+}
+
+export function nextTick(cb) {
+  callbacks.push(cb);
+  console.log('cb',cb)
+  if(!pending) {
+    timerFunc();
+    
+  }
+  // Promise.resolve().then()
+  // console.log('cb',cb);
 }

@@ -1,5 +1,14 @@
+/*
+ * :file description: 
+ * :name: /cvue/src/state.js
+ * :author: 张德志
+ * :copyright: (c) 2022, Tungee
+ * :date created: 2022-07-01 06:30:08
+ * :last editor: 张德志
+ * :date last edited: 2022-07-31 15:39:45
+ */
 import { observe } from "./observer/index";
-import { proxy } from './utils';
+import { nextTick, proxy } from './utils';
 
 export function initState(vm) {
   const options = vm.$options;
@@ -46,4 +55,10 @@ function initComputed() {
 
 function initWatch() {
 
+}
+
+export function stateMixin(Vue) {
+  Vue.prototype.$nextTick = function(cb) {
+    nextTick(cb);
+  }
 }

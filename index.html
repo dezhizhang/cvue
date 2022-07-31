@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 05:47:45
  * :last editor: 张德志
- * :date last edited: 2022-07-31 10:44:44
+ * :date last edited: 2022-07-31 15:57:23
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -46,6 +46,10 @@
       });
       setTimeout(() => {
         vm.arr.push(123)
+        vm.arr= 456;
+        vm.$nextTick(() => {
+          // vm.arr.push(123)
+        })
       },100)
       
     </script>
