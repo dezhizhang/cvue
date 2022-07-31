@@ -5,12 +5,13 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 06:49:27
  * :last editor: 张德志
- * :date last edited: 2022-07-31 09:47:53
+ * :date last edited: 2022-07-31 10:45:09
  */
 import { arrayMethods } from "./array";
 import Dep from './dep';
 class Observer {
   constructor(value) {
+    this.dep = new Dep();
     Object.defineProperty(value, "__ob__", {
       enumerable: false,
       configurable: false,
@@ -38,12 +39,16 @@ class Observer {
 }
 
 function defineReactive(data, key, value) {
-  observe(value);
+  let childDep = observe(value);
   let dep = new Dep();
   Object.defineProperty(data, key, {
     get() {
       if(Dep.target) {
         dep.depend();
+        if(typeof childDep == 'object') {
+          // 默认组数组增加了一个属性
+          childDep.dep.depend()
+        }
       }
       return value;
     },
@@ -60,7 +65,7 @@ function defineReactive(data, key, value) {
 
 export function observe(data) {
   if (typeof data !== "object" && data !== null) {
-    return data;
+    return;
   }
   if(data.__ob__) {
     return data;
