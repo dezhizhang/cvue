@@ -6,7 +6,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-02 14:41:16
  * :last editor: 张德志
- * :date last edited: 2022-07-31 15:56:01
+ * :date last edited: 2022-07-31 16:00:44
  */
 export function proxy(vm, data, key) {
 
@@ -92,7 +92,9 @@ let pending = false;
 let callbacks = [];
 function flushCallbacks() {
   callbacks.forEach(cb => cb());
-  pending = true;
+  pending = false;
+  callbacks = [];
+  
 }
 
 let timerFunc;
@@ -122,7 +124,7 @@ export function nextTick(cb) {
   console.log('cb',cb)
   if(!pending) {
     timerFunc();
-    
+    pending = true;
   }
   // Promise.resolve().then()
   // console.log('cb',cb);
