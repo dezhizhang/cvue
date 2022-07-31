@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-26 06:43:13
  * :last editor: 张德志
- * :date last edited: 2022-07-28 06:21:32
+ * :date last edited: 2022-07-31 08:34:19
  */
 
 
@@ -17,6 +17,7 @@ export function patch(oldVnode,vnode) {
     parentElm.insertBefore(el,oldVnode.nextSibling);
     // 删除老节点
     parentElm.removeChild(oldVnode);
+    return el;
 }
 
 

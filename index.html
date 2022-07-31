@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 05:47:45
  * :last editor: 张德志
- * :date last edited: 2022-07-31 07:16:21
+ * :date last edited: 2022-07-31 09:44:41
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +32,7 @@
           console.log('created b...')
         }
       });
-      
+
 
       const vm = new Vue({
         el: "#app",
@@ -44,6 +44,10 @@
         // },
         // // template: "",
       });
+      setTimeout(() => {
+        vm.name = 'change';
+      },1000)
+      
     </script>
   </body>
 </html>
