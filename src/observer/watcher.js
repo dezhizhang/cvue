@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-31 08:41:07
  * :last editor: 张德志
- * :date last edited: 2022-07-31 15:31:46
+ * :date last edited: 2022-07-31 17:04:16
  */
 import { pushTarget, popTarget } from "./dep";
 let id = 0;
@@ -17,12 +17,24 @@ class Watcher {
     this.id = id++;
     this.exprorFn = exprorFn;
     this.options = options;
+    this.user = options.user;
+    this.isWatcher = !options.user;
     this.deps = [];
+    this.value = undefined;
     this.depsId = new Set();
     if (typeof exprorFn == "function") {
       this.getter = exprorFn;
+    }else {
+      this.getter = function() {
+        let path = exprorFn.split(',');
+        let obj = vm;
+        for(let i=0;i < path.length;i++) {
+          obj = obj[path[i]];
+        }
+        return obj;
+      }
     }
-    this.get();
+    this.value = this.get();
   }
   addDep(dep) {
     let id = dep.id;
@@ -35,11 +47,16 @@ class Watcher {
 
   get() {
     pushTarget(this);
-    this.getter();
+    let result = this.getter();
     popTarget();
+    return result;
   }
   run() {
-    this.get();
+    let newValue = this.get();
+    let oldVnode = this.value;
+    if(this.user) {
+      this.cb.call(this.vm,newValue,oldVnode);
+    }
   }
   update() {
     queueWatcher(this);
@@ -52,7 +69,13 @@ let has = {};
 let pending = false;
 
 function flushSchedulerQueue() {
-  queue.forEach(watcher => watcher.run());
+  queue.forEach(watcher => {
+    watcher.run();
+    if(watcher.isWatcher) {
+      watcher.cb();
+    }
+  })
+  // queue.forEach(watcher => watcher.run());
   queue = [];
   has = {};
   pending = false;
@@ -70,13 +93,6 @@ function queueWatcher(watcher) {
     has[id] = true;
     if (!pending) {
       nextTick(flushSchedulerQueue);
-      // setTimeout(() => {
-      //   queue.forEach((watcher) => watcher.run());
-      //   queue = [];
-      //   has = {};
-      //   pending = false;
-      // }, 0);
-      // pending = true;
     }
   }
 }

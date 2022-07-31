@@ -5,9 +5,10 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 06:30:08
  * :last editor: 张德志
- * :date last edited: 2022-07-31 15:39:45
+ * :date last edited: 2022-07-31 17:15:18
  */
 import { observe } from "./observer/index";
+import Watcher from "./observer/watcher";
 import { nextTick, proxy } from './utils';
 
 export function initState(vm) {
@@ -25,7 +26,7 @@ export function initState(vm) {
     initComputed(vm);
   }
   if (options.watch) {
-    initWatch();
+    initWatch(vm);
   }
 }
 
@@ -53,12 +54,43 @@ function initComputed() {
 
 }
 
-function initWatch() {
+function initWatch(vm) {
+  let watch = vm.$options.watch;
+  for(let key in watch) {
+    const handler = watch[key];
+    if(Array.isArray(handler)) {
+      handler.forEach(handle => {
+        createWatcher(vm,key,handle);
+      })
+    }else {
+      createWatcher(vm,key,handler);
+    }
+  }
+}
 
+
+function createWatcher(vm,exprOrFn,handler,options) {
+  if(typeof handler == 'object') {
+    options = handler;
+    handler = handler.handler;
+  }
+  if(typeof handler == 'string') {
+    handler = vm[handler];
+  }
+  console.log('handler',handler);
+  return vm.$watch(exprOrFn,handler,options);
 }
 
 export function stateMixin(Vue) {
   Vue.prototype.$nextTick = function(cb) {
     nextTick(cb);
+  }
+  Vue.prototype.$watch = function(exprOrFn,cb,options) {
+   let watcher = new Watcher(this,exprOrFn,cb,{...options,user:true});
+   if(options.immediate) {
+    console.log('cb',cb);
+    // cb();
+    
+   }
   }
 }
