@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-26 06:43:13
  * :last editor: 张德志
- * :date last edited: 2022-08-02 04:46:22
+ * :date last edited: 2022-08-02 05:08:00
  */
 
 
@@ -49,16 +49,32 @@ export function createElm(vnode) {
     return vnode.el;
 }
 
-function updateProperties(vnode) {
+function updateProperties(vnode,oldProps={}) {
     let el = vnode.el;
     let newProps = vnode.data || {};
+
+    for(let key in oldProps) {
+        if(!newProps[key]) {
+            el.removeAttribute(key);
+        }
+    }
+
+    let newStyle = newProps.style || {};
+    let oldStyle = newProps.style || {};
+
+    for(let key in oldStyle) {
+        if(!newStyle[key]) {
+            el.style[key] = ''
+        }
+    }
+    console.log('newProps',newProps);
     for(let key in newProps) {
         if(key == 'style') {
             for(let styleName in newProps.key) {
                 el.style[styleName] = newProps.style[styleName];
             }
         }else if(key == 'class') {
-            el.className = el.class;
+            el.className = newProps.class;
         }else {
             el.setAttribute(key,newProps[key]);
         }
