@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-31 09:24:09
  * :last editor: 张德志
- * :date last edited: 2022-07-31 10:08:06
+ * :date last edited: 2022-08-03 06:38:04
  */
 
 let id = 0;
@@ -29,13 +29,17 @@ class Dep {
 
 
 Dep.target = null;
-
+let stack = []
 export function pushTarget(watcher) {
     Dep.target = watcher;
+    stack.push(watcher)
 }
 
 export function popTarget() {
+    stack.pop();
+    
     Dep.target = null;
+
 }
 
 
