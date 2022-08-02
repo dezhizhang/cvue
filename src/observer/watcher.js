@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-31 08:41:07
  * :last editor: 张德志
- * :date last edited: 2022-08-03 06:06:14
+ * :date last edited: 2022-08-03 06:15:51
  */
 import { pushTarget, popTarget } from "./dep";
 let id = 0;
@@ -49,7 +49,7 @@ class Watcher {
 
   get() {
     pushTarget(this);
-    let result = this.getter();
+    let result = this.getter.call(this.vm);
     popTarget();
     return result;
   }
