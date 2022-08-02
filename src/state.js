@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 06:30:08
  * :last editor: 张德志
- * :date last edited: 2022-07-31 17:15:18
+ * :date last edited: 2022-08-03 05:40:34
  */
 import { observe } from "./observer/index";
 import Watcher from "./observer/watcher";
@@ -38,6 +38,29 @@ function initMethods() {
 
 }
 
+function initComputed(vm) {
+  let computed = vm.$options.computed;
+  const watchers =vm._computedWatchers = {};
+
+  for(let key in computed) {
+    let userDef = computed[key];
+    const getter = typeof userDef == 'function' ? userDef:userDef.get;
+    defineComponent(vm,key,userDef)
+  }
+}
+const sharedPropertyDefinition = {};
+
+function defineComponent(target,key,userDef) {
+  if(typeof userDef == 'function') {
+    sharedPropertyDefinition.get = userDef;
+  }else {
+    sharedPropertyDefinition.get = userDef.get;
+    sharedPropertyDefinition.set = userDef.set;
+  }
+  Object.defineProperty(target,key,sharedPropertyDefinition);
+}
+
+
 function initData(vm) {
     let data = vm.$options.data;
     vm._data = data = typeof data == 'function' ? data.call(vm):data;
@@ -50,9 +73,7 @@ function initData(vm) {
     
 }
 
-function initComputed() {
 
-}
 
 function initWatch(vm) {
   let watch = vm.$options.watch;

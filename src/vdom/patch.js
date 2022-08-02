@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-26 06:43:13
  * :last editor: 张德志
- * :date last edited: 2022-08-02 05:08:00
+ * :date last edited: 2022-08-02 05:34:17
  */
 
 
@@ -31,6 +31,9 @@ export function patch(oldVnode,vnode) {
                 return oldVnode.el.textContent = vnode.text;
             }
         }
+        let el = vnode.el = oldVnode.el;
+        updateProperties(vnode,oldVnode.data);
+        
     }
 
 }

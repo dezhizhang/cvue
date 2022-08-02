@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 05:47:45
  * :last editor: 张德志
- * :date last edited: 2022-08-02 04:47:14
+ * :date last edited: 2022-08-03 05:37:08
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -16,6 +16,24 @@
     <title>vue</title>
   </head>
   <body>
+    <div id="app">app</div>
     <script src="build/umd/vue.js"></script>
+    <script>
+      let vm = new Vue({
+        el:'#app',
+        data:{
+          fistName:'hello',
+          lastName:'change'
+        },
+        computed:{
+          fullName() {
+            console.log('--------change');
+            return this.fistName + this.lastName
+          }
+        }
+      });
+      vm.fullName;
+      
+    </script>
   </body>
 </html>
