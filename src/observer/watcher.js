@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-31 08:41:07
  * :last editor: 张德志
- * :date last edited: 2022-08-03 05:55:44
+ * :date last edited: 2022-08-03 06:06:14
  */
 import { pushTarget, popTarget } from "./dep";
 let id = 0;
@@ -61,8 +61,15 @@ class Watcher {
     }
   }
   update() {
-    queueWatcher(this);
-    this.get();
+    if(this.lazy) {
+      this.dirty = true;
+    }else {
+      queueWatcher(this);
+    }
+  }
+  evaluate() {
+    this.valu = this.get();
+    this.dirty = false;
   }
 }
 

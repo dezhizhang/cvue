@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 06:30:08
  * :last editor: 张德志
- * :date last edited: 2022-08-03 05:52:44
+ * :date last edited: 2022-08-03 06:13:14
  */
 import { observe } from "./observer/index";
 import Watcher from "./observer/watcher";
@@ -53,12 +53,24 @@ const sharedPropertyDefinition = {};
 
 function defineComponent(target,key,userDef) {
   if(typeof userDef == 'function') {
-    sharedPropertyDefinition.get = userDef;
+    sharedPropertyDefinition.get = createComputedGetter(key);
   }else {
-    sharedPropertyDefinition.get = userDef.get;
+    sharedPropertyDefinition.get = createComputedGetter(key);
     sharedPropertyDefinition.set = userDef.set;
   }
   Object.defineProperty(target,key,sharedPropertyDefinition);
+}
+
+function createComputedGetter(key) {
+  return function() {
+    const watcher = this._computedWatchers[key];
+    if(watcher) {
+      if(watcher.dirty) {
+        watcher.evaluate();
+      }
+      return watcher.value;
+    }
+  }
 }
 
 
