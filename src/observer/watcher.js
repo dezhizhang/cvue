@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-31 08:41:07
  * :last editor: 张德志
- * :date last edited: 2022-07-31 17:04:16
+ * :date last edited: 2022-08-03 05:55:44
  */
 import { pushTarget, popTarget } from "./dep";
 let id = 0;
@@ -18,6 +18,8 @@ class Watcher {
     this.exprorFn = exprorFn;
     this.options = options;
     this.user = options.user;
+    this.lazy = options.lazy;
+    this.dirty = this.lazy;
     this.isWatcher = !options.user;
     this.deps = [];
     this.value = undefined;
@@ -34,7 +36,7 @@ class Watcher {
         return obj;
       }
     }
-    this.value = this.get();
+    this.value = this.lazy ? void 0:this.get();
   }
   addDep(dep) {
     let id = dep.id;

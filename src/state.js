@@ -5,7 +5,7 @@
  * :copyright: (c) 2022, Tungee
  * :date created: 2022-07-01 06:30:08
  * :last editor: 张德志
- * :date last edited: 2022-08-03 05:40:34
+ * :date last edited: 2022-08-03 05:52:44
  */
 import { observe } from "./observer/index";
 import Watcher from "./observer/watcher";
@@ -45,6 +45,7 @@ function initComputed(vm) {
   for(let key in computed) {
     let userDef = computed[key];
     const getter = typeof userDef == 'function' ? userDef:userDef.get;
+    watchers[key] = new Watcher(vm,getter,() =>{},{lazy:true})
     defineComponent(vm,key,userDef)
   }
 }
